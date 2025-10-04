@@ -1,86 +1,27 @@
-:root {
-    --bg: #0f1115;
-    --panel: #171a21;
-    --muted: #8a8f98;
-    --fg: #e8eef8;
-    --brand: #7aa2ff;
-    --accent: #61d095;
-    --danger: #ff6b6b;
-    --pill: #2a2f3a;
-    --card: #161a21;
-    --border: #242936;
-  }
-  
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; background: var(--bg); color: var(--fg);
-    font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  }
-  a { color: var(--brand); text-decoration: none; }
-  a.danger { color: var(--danger); }
-  .container { max-width: 980px; margin: 0 auto; padding: 16px; }
-  
-  .topbar {
-    background: var(--panel); border-bottom: 1px solid var(--border);
-  }
-  .nav { display: grid; grid-template-columns: 120px 1fr 240px; gap: 12px; align-items: center; }
-  .brand { font-weight: 700; color: var(--fg); }
-  .links a { margin-right: 12px; }
-  .btn, .linkbtn {
-    display: inline-block; padding: 6px 10px; border-radius: 8px;
-    background: var(--brand); color: #0a0a0a; font-weight: 600;
-  }
-  .linkbtn { background: var(--pill); color: var(--fg); }
-  .search { text-align: right; }
-  .search input {
-    width: 100%; padding: 6px 10px; background: var(--pill);
-    color: var(--fg); border: 1px solid var(--border); border-radius: 8px;
-  }
-  
-  h1 { margin: 16px 0; }
-  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
-  .form-grid p { margin: 0 0 12px; }
-  .form-grid input[type="text"], .form-grid textarea, .form-grid select, .form-grid input[type="date"] {
-    width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border);
-    background: var(--pill); color: var(--fg);
-  }
-  .actions { display: flex; gap: 10px; }
-  
-  .filters { display: flex; gap: 10px; margin: 10px 0 16px; }
-  .filters select {
-    background: var(--pill); color: var(--fg); border: 1px solid var(--border);
-    padding: 6px 10px; border-radius: 8px;
-  }
-  
-  .task-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
-  .task-card {
-    display: grid; grid-template-columns: 32px 1fr auto; gap: 12px;
-    padding: 12px; border-radius: 12px; background: var(--card); border: 1px solid var(--border);
-  }
-  .task-card .check {
-    width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--accent);
-    background: transparent; cursor: pointer; margin-top: 4px;
-  }
-  .task-card.is-done .title { text-decoration: line-through; color: var(--muted); }
-  .task-main .title { font-weight: 700; }
-  .task-main .desc { color: var(--muted); }
-  .badge { background: var(--pill); padding: 2px 8px; border-radius: 999px; margin-right: 8px; }
-  .pill { background: var(--pill); padding: 2px 8px; border-radius: 6px; margin-left: 6px; color: var(--muted); }
-  
-  .kanban {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
-  }
-  .kanban section { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
-  .kanban h2 { margin: 4px 0 12px; }
-  .k-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-  .k-actions button { background: var(--pill); color: var(--fg); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; cursor: pointer; }
-  
-  .cal-nav { display: flex; gap: 8px; margin-bottom: 10px; }
-  .calendar { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--border); }
-  .calendar th, .calendar td { border: 1px solid var(--border); padding: 8px; vertical-align: top; }
-  .calendar .empty { background: #0b0d12; }
-  .calendar .day { font-weight: 700; margin-bottom: 6px; color: var(--muted); }
-  .calendar .mini { list-style: none; margin: 0; padding: 0; }
-  .muted { color: var(--muted); }
-  .btn.danger { background: var(--danger); color: #0a0a0a; }
-  
+body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#0f1115;color:#e8e8ea;margin:0}
+a{color:#8ab4ff;text-decoration:none}
+.container{max-width:900px;margin:32px auto;padding:0 16px}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#171923;border-bottom:1px solid #2a2f3a}
+.brand{font-weight:700;color:#e8e8ea}
+.topbar nav a{margin-left:16px}
+.btn,.linkbtn{background:#3b82f6;color:#fff;border:0;border-radius:8px;padding:8px 12px}
+.btn.danger{background:#ef4444}
+.inline{display:inline-block;margin-left:12px}
+.stats{margin-left:12px;opacity:.8}
+.task-list{list-style:none;margin:16px 0;padding:0}
+.task-card{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start;background:#171923;border:1px solid #2a2f3a;border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.task-card.is-done .title{text-decoration:line-through;opacity:.6}
+.check{width:20px;height:20px;border-radius:5px;border:2px solid #3b82f6;background:transparent;cursor:pointer}
+.task-card.is-done .check{background:#3b82f6}
+.title{font-weight:600}
+.desc{opacity:.9;margin-top:6px}
+.meta{margin-top:8px}
+.pill{background:#2a2f3a;border-radius:999px;padding:2px 8px;margin-right:8px}
+.badge{border:1px solid #2a2f3a;border-radius:6px;padding:2px 6px;margin-left:6px}
+.actions .link{margin-left:10px}
+.actions .danger{color:#fb7185}
+.card{background:#171923;border:1px solid #2a2f3a;border-radius:10px;padding:10px;margin-bottom:8px}
+.form-grid p{display:flex;flex-direction:column}
+.kanban{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.kanban h3{margin-top:0}
+.muted{opacity:.6}

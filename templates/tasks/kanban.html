@@ -1,49 +1,24 @@
-{% extends "base.html" %}
+{% extends "tasks/base.html" %}
 {% block content %}
 <h1>Kanban</h1>
 <div class="kanban">
   <section>
-    <h2>To do</h2>
+    <h3>To-do</h3>
     {% for t in todo %}
-      <article class="task-card">
-        <div class="title">{{ t.title }}</div>
-        {% if t.due_date %}<div class="pill">Due: {{ t.due_date }}</div>{% endif %}
-        <div class="k-actions">
-          <form method="post" action="{% url 'tasks:set_status' t.pk 'doing' %}">{% csrf_token %}<button>→ Doing</button></form>
-          <form method="post" action="{% url 'tasks:set_status' t.pk 'done' %}">{% csrf_token %}<button>✓ Done</button></form>
-          <a href="{% url 'tasks:edit' t.pk %}">edit</a>
-        </div>
-      </article>
-    {% empty %}<p class="muted">No items.</p>{% endfor %}
+      <div class="card"><a href="{% url 'tasks:edit' t.pk %}">{{ t.title }}</a></div>
+    {% empty %}<p class="muted">Nothing here.</p>{% endfor %}
   </section>
-
   <section>
-    <h2>In progress</h2>
+    <h3>Doing</h3>
     {% for t in doing %}
-      <article class="task-card">
-        <div class="title">{{ t.title }}</div>
-        {% if t.due_date %}<div class="pill">Due: {{ t.due_date }}</div>{% endif %}
-        <div class="k-actions">
-          <form method="post" action="{% url 'tasks:set_status' t.pk 'todo' %}">{% csrf_token %}<button>← To do</button></form>
-          <form method="post" action="{% url 'tasks:set_status' t.pk 'done' %}">{% csrf_token %}<button>✓ Done</button></form>
-          <a href="{% url 'tasks:edit' t.pk %}">edit</a>
-        </div>
-      </article>
-    {% empty %}<p class="muted">No items.</p>{% endfor %}
+      <div class="card"><a href="{% url 'tasks:edit' t.pk %}">{{ t.title }}</a></div>
+    {% empty %}<p class="muted">Nothing here.</p>{% endfor %}
   </section>
-
   <section>
-    <h2>Done</h2>
+    <h3>Done</h3>
     {% for t in done %}
-      <article class="task-card is-done">
-        <div class="title">{{ t.title }}</div>
-        {% if t.due_date %}<div class="pill">Due: {{ t.due_date }}</div>{% endif %}
-        <div class="k-actions">
-          <form method="post" action="{% url 'tasks:set_status' t.pk 'doing' %}">{% csrf_token %}<button>↺ Doing</button></form>
-          <a class="danger" href="{% url 'tasks:delete' t.pk %}">delete</a>
-        </div>
-      </article>
-    {% empty %}<p class="muted">No items.</p>{% endfor %}
+      <div class="card done"><a href="{% url 'tasks:edit' t.pk %}">{{ t.title }}</a></div>
+    {% empty %}<p class="muted">Nothing here.</p>{% endfor %}
   </section>
 </div>
 {% endblock %}

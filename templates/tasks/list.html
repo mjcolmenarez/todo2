@@ -1,49 +1,49 @@
-{% extends "base.html" %}
+{% extends "tasks/base.html" %}
 {% block content %}
 <h1>Your Tasks</h1>
 
-<form class="filters" method="get">
-  <select name="status" onchange="this.form.submit()">
-    <option value="">All statuses</option>
-    <option value="todo"  {% if request.GET.status == 'todo' %}selected{% endif %}>To do</option>
-    <option value="doing" {% if request.GET.status == 'doing' %}selected{% endif %}>In progress</option>
-    <option value="done"  {% if request.GET.status == 'done' %}selected{% endif %}>Done</option>
-  </select>
+<div class="bar">
+  <a class="btn" href="{% url 'tasks:create' %}">+ New Task</a>
 
-  <select name="order" onchange="this.form.submit()">
-    <option value="">Default order</option>
-    <option value="due"      {% if request.GET.order == 'due' %}selected{% endif %}>Due date</option>
-    <option value="priority" {% if request.GET.order == 'priority' %}selected{% endif %}>Priority</option>
-    <option value="created"  {% if request.GET.order == 'created' %}selected{% endif %}>Newest</option>
-  </select>
-  <noscript><button>Apply</button></noscript>
-</form>
+  <form method="get" class="inline">
+    <label>Order:</label>
+    <select name="order" onchange="this.form.submit()">
+      <option value="due" {% if order == 'due' %}selected{% endif %}>Due date</option>
+      <option value="priority" {% if order == 'priority' %}selected{% endif %}>Priority</option>
+      <option value="created" {% if order == 'created' %}selected{% endif %}>Newest</option>
+    </select>
+  </form>
+
+  <span class="stats">
+    total {{ stats.total }} • todo {{ stats.todo }} • doing {{ stats.doing }} • done {{ stats.done }}
+  </span>
+</div>
 
 <ul class="task-list">
   {% for t in tasks %}
-    <li class="task-card {% if t.status == 'done' %}is-done{% endif %}">
-      <form method="post" action="{% url 'tasks:toggle' t.pk %}">
-        {% csrf_token %}
-        <button class="check" title="Toggle done"></button>
-      </form>
+  <li class="task-card {% if t.status == 'done' %}is-done{% endif %}">
+    <form method="post" action="{% url 'tasks:toggle' t.pk %}">
+      {% csrf_token %}
+      <button class="check" title="Toggle done"></button>
+    </form>
 
-      <div class="task-main">
-        <div class="title">{{ t.title }}</div>
-        {% if t.description %}<div class="desc">{{ t.description }}</div>{% endif %}
-        <div class="meta">
-          <span class="badge">{{ t.get_status_display }}</span>
-          {% if t.due_date %}<span class="pill">Due: {{ t.due_date }}</span>{% endif %}
-          <span class="pill">Priority: {{ t.get_priority_display }}</span>
-        </div>
+    <div class="task-main">
+      <div class="title">{{ t.title }}</div>
+      {% if t.description %}<div class="desc">{{ t.description }}</div>{% endif %}
+      <div class="meta">
+        {% if t.due_date %}<span class="pill">Due: {{ t.due_date }}</span>{% endif %}
+        <span class="badge">{{ t.get_priority_display }}</span>
+        <span class="badge">{{ t.get_status_display }}</span>
       </div>
+    </div>
 
-      <div class="actions">
-        <a href="{% url 'tasks:edit' t.pk %}">edit</a>
-        <a class="danger" href="{% url 'tasks:delete' t.pk %}">delete</a>
-      </div>
-    </li>
+    <div class="actions">
+      <a class="link" href="{% url 'tasks:edit' t.pk %}">edit</a>
+      <a class="link danger" href="{% url 'tasks:delete' t.pk %}">delete</a>
+    </div>
+  </li>
   {% empty %}
-    <p>No tasks yet. Click “+ New Task”.</p>
+    <p>No tasks yet.</p>
   {% endfor %}
 </ul>
 {% endblock %}
