@@ -1,4 +1,4 @@
-# todo2 — Minimal Django To-Do App
+# todo2 — To-Do App
 
 A compact, modern to-do app built with Django and SQLite. It focuses on a clean UI and two views for working with tasks:
 
