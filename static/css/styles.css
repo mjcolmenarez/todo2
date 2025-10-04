@@ -121,3 +121,9 @@ ul.task-list{list-style:none;margin:0;padding:0}
 .task-card .item-actions a{font-size:14px}
 .check{inline-size:28px;block-size:28px;border-radius:8px;border:1px solid var(--border);background:#0f1523}
 .check:hover{filter:brightness(1.1)}
+/* === UI polish: form spacing === */
+.form-grid{
+  grid-template-columns:1fr;
+}
+.actions{display:flex;gap:10px;margin-top:12px}
+.actions .btn{min-width:110px;justify-content:center}
