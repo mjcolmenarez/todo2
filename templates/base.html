@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>To-Do</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="/static/css/styles.css" rel="stylesheet">
+</head>
+<body>
+<header class="topbar">
+  <nav class="container nav">
+    <a class="brand" href="{% url 'tasks:list' %}">To-do</a>
+    <div class="links">
+      <a href="{% url 'tasks:list' %}">List</a>
+      <a href="{% url 'tasks:kanban' %}">Kanban</a>
+      <a href="{% url 'tasks:calendar' %}">Calendar</a>
+      <a class="btn" href="{% url 'tasks:create' %}">+ New Task</a>
+    </div>
+    <form class="search" method="get" action="{% url 'tasks:list' %}">
+      <input name="q" placeholder="Search…" value="{{ request.GET.q }}">
+    </form>
+  </nav>
+</header>
+
+<main class="container">
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

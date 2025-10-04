@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ view.object|default:"New Task" }}</h1>
+<div class="card">
+  <form method="post" class="form-grid">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="actions">
+      <button class="btn" type="submit">Save</button>
+      <a class="linkbtn" href="{% url 'tasks:list' %}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ month_name }} {{ year }}</h1>
+
+<div class="actions" style="margin: .5rem 0 1rem">
+  <a class="linkbtn" href="{% url 'tasks:calendar' %}?y={{ prev_y }}&m={{ prev_m }}">◀ Prev</a>
+  <a class="linkbtn" href="{% url 'tasks:calendar' %}?y={{ next_y }}&m={{ next_m }}">Next ▶</a>
+  <a class="linkbtn" href="{% url 'tasks:list' %}">Back to list</a>
+</div>
+
+<table class="cal" style="width:100%; border-collapse:collapse;">
+  <thead>
+    <tr>
+      {% for name in weekday_headers %}
+        <th style="text-align:left; padding:.5rem; border-bottom:1px solid #333;">{{ name|slice:":3" }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for week in weeks %}
+      <tr>
+        {% for d, items in week %}
+          {% if d == 0 %}
+            <td class="empty" style="height:110px; background:#111;"></td>
+          {% else %}
+            <td style="vertical-align:top; height:110px; padding:.25rem; border:1px solid #222;">
+              <div class="day" style="font-weight:600; opacity:.8; margin-bottom:.25rem;">{{ d }}</div>
+              <ul class="mini" style="list-style:none; padding-left:0; margin:0;">
+                {% for t in items %}
+                  <li style="margin:0 0 .25rem;">
+                    <a href="{% url 'tasks:edit' t.pk %}">{{ t.title }}</a>
+                  </li>
+                {% empty %}
+                {% endfor %}
+              </ul>
+            </td>
+          {% endif %}
+        {% endfor %}
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
