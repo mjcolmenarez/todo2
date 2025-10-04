@@ -1,98 +1,95 @@
-from datetime import date, timedelta
-import calendar
-
-from django.shortcuts import render
-from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
+from django.db.models import Count, Q
+import csv
 
 from .models import Task
+from .forms import TaskForm
 
+def list_view(request):
+    order = request.GET.get("order", "due")
+    qs = Task.objects.all()
+    if order == "priority":
+        # high > med > low
+        priority_weight = {"high": 3, "med": 2, "low": 1}
+        qs = sorted(qs, key=lambda t: (-priority_weight.get(t.priority,0), t.due_date or ""))
+    elif order == "created":
+        qs = Task.objects.order_by("-created_at")
+    else:
+        qs = Task.objects.order_by("due_date", "title")
 
-# ---------- Basic CRUD ----------
+    stats = {
+        "total": Task.objects.count(),
+        "todo": Task.objects.filter(status="todo").count(),
+        "doing": Task.objects.filter(status="doing").count(),
+        "done": Task.objects.filter(status="done").count(),
+    }
+    return render(request, "tasks/list.html", {"tasks": qs, "stats": stats, "order": order})
 
-class TaskList(ListView):
-    template_name = "tasks/list.html"
-    model = Task
-    context_object_name = "tasks"
+def create_view(request):
+    if request.method == "POST":
+        form = TaskForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("tasks:list")
+    else:
+        form = TaskForm()
+    return render(request, "tasks/form.html", {"form": form})
 
-    def get_queryset(self):
-        return (
-            Task.objects.all()
-            .order_by("due_date", "-priority", "title")
-        )
+def update_view(request, pk):
+    task = get_object_or_404(Task, pk=pk)
+    if request.method == "POST":
+        form = TaskForm(request.POST, instance=task)
+        if form.is_valid():
+            form.save()
+            return redirect("tasks:list")
+    else:
+        form = TaskForm(instance=task)
+    return render(request, "tasks/form.html", {"form": form, "task": task})
 
+def delete_view(request, pk):
+    task = get_object_or_404(Task, pk=pk)
+    if request.method == "POST":
+        task.delete()
+        return redirect("tasks:list")
+    return render(request, "tasks/confirm_delete.html", {"task": task})
 
-class TaskCreate(CreateView):
-    model = Task
-    template_name = "tasks/form.html"
-    fields = ["title", "description", "due_date", "priority", "status"]
-    success_url = reverse_lazy("tasks:list")
-
-
-class TaskUpdate(UpdateView):
-    model = Task
-    template_name = "tasks/form.html"
-    fields = ["title", "description", "due_date", "priority", "status"]
-    success_url = reverse_lazy("tasks:list")
-
-
-class TaskDelete(DeleteView):
-    model = Task
-    template_name = "tasks/confirm_delete.html"
-    success_url = reverse_lazy("tasks:list")
-
-
-# ---------- Kanban ----------
+def toggle(request, pk):
+    """Toggle done <-> todo (leaves 'doing' alone)."""
+    if request.method != "POST":
+        return redirect("tasks:list")
+    task = get_object_or_404(Task, pk=pk)
+    task.status = "todo" if task.status == "done" else "done"
+    task.save(update_fields=["status"])
+    return redirect("tasks:list")
 
 def kanban_view(request):
-    qs = Task.objects.all().order_by("priority", "due_date", "title")
-    ctx = {
-        "todo": qs.filter(status="todo"),
-        "doing": qs.filter(status="doing"),
-        "done": qs.filter(status="done"),
-    }
-    return render(request, "tasks/kanban.html", ctx)
+    return render(
+        request,
+        "tasks/kanban.html",
+        {
+            "todo": Task.objects.filter(status="todo").order_by("due_date"),
+            "doing": Task.objects.filter(status="doing").order_by("due_date"),
+            "done": Task.objects.filter(status="done").order_by("due_date"),
+        },
+    )
 
+def export_csv(request):
+    """Export all tasks (respects ?order= like list)."""
+    order = request.GET.get("order", "due")
+    qs = Task.objects.all()
+    if order == "priority":
+        priority_order = {"high": 3, "med": 2, "low": 1}
+        qs = sorted(qs, key=lambda t: (-priority_order.get(t.priority,0), t.due_date or ""))
+    elif order == "created":
+        qs = Task.objects.order_by("-created_at")
+    else:
+        qs = Task.objects.order_by("due_date", "title")
 
-# ---------- Calendar ----------
-
-def _month_nav(year: int, month: int):
-    first = date(year, month, 1)
-    prev_first = (first - timedelta(days=1)).replace(day=1)
-    last_day = calendar.monthrange(year, month)[1]
-    next_first = (date(year, month, last_day) + timedelta(days=1)).replace(day=1)
-    return prev_first.year, prev_first.month, next_first.year, next_first.month
-
-
-def calendar_view(request):
-    today = date.today()
-    y = int(request.GET.get("y", today.year))
-    m = int(request.GET.get("m", today.month))
-
-    cal = calendar.Calendar(firstweekday=0)
-    raw_weeks = cal.monthdayscalendar(y, m)  # list of weeks, days as ints (0 for blanks)
-
-    # Map day -> list[Task] for tasks due in this month
-    month_tasks = Task.objects.filter(due_date__year=y, due_date__month=m)
-    by_day = {}
-    for t in month_tasks:
-        by_day.setdefault(t.due_date.day, []).append(t)
-
-    # Build a grid the template can iterate without calling methods:
-    # weeks = [ [(d, [tasks...]), ...], ... ]
-    weeks = [[(d, by_day.get(d, [])) for d in week] for week in raw_weeks]
-
-    prev_y, prev_m, next_y, next_m = _month_nav(y, m)
-
-    ctx = {
-        "year": y,
-        "month": m,
-        "month_name": calendar.month_name[m],
-        "weeks": weeks,
-        "prev_y": prev_y,
-        "prev_m": prev_m,
-        "next_y": next_y,
-        "next_m": next_m,
-        "weekday_headers": list(calendar.day_name),
-    }
-    return render(request, "tasks/calendar.html", ctx)
+    resp = HttpResponse(content_type="text/csv")
+    resp["Content-Disposition"] = 'attachment; filename="tasks.csv"'
+    w = csv.writer(resp)
+    w.writerow(["Title", "Description", "Due date", "Priority", "Status", "Created"])
+    for t in qs:
+        w.writerow([t.title, t.description, t.due_date or "", t.get_priority_display(), t.get_status_display(), t.created_at.strftime("%Y-%m-%d %H:%M")])
+    return resp

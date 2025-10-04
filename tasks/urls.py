@@ -1,14 +1,14 @@
 from django.urls import path
-
 from . import views
 
 app_name = "tasks"
 
 urlpatterns = [
-    path("", views.TaskList.as_view(), name="list"),
-    path("new/", views.TaskCreate.as_view(), name="create"),
-    path("<int:pk>/edit/", views.TaskUpdate.as_view(), name="edit"),
-    path("<int:pk>/delete/", views.TaskDelete.as_view(), name="delete"),
+    path("", views.list_view, name="list"),
+    path("new/", views.create_view, name="create"),
+    path("edit/<int:pk>/", views.update_view, name="edit"),
+    path("delete/<int:pk>/", views.delete_view, name="delete"),
+    path("toggle/<int:pk>/", views.toggle, name="toggle"),
     path("kanban/", views.kanban_view, name="kanban"),
-    path("calendar/", views.calendar_view, name="calendar"),
+    path("export/", views.export_csv, name="export"),
 ]
